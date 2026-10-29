@@ -1,4 +1,6 @@
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class LinkedListWithCursor<T> {
     //Importante: No cambiar ni los nombres ni la visibilidad
@@ -16,56 +18,132 @@ public class LinkedListWithCursor<T> {
 
 
     public LinkedListWithCursor(Collection<T> col, int index) {
-        // TODO Ejercicio 1
-        throw new UnsupportedOperationException("Ejercicio 1: por implementar");
+        left = null;
+        right = null;
+        sizeLeft = 0;
+        sizeRight = 0;
+
+        // Indice del puntero fuera de rango
+        if (index < 0 || index > col.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        // Caso de Collection vacia
+        if (col.isEmpty()) {
+            return;
+        }
+
+        // Caso general
+        Iterator<T> iter = col.iterator();
+            // Primer nodo izquierda
+        if (index > 0) {
+            left = new Node<>(iter.next(), null);
+            sizeLeft++;
+        }
+            // Izquierda
+        for (int i = 1; i < index; i++) {
+            left = new Node<>(iter.next(),left);
+            sizeLeft++;
+        }
+
+            // Primer nodo derecha
+        if (index < col.size()) {
+            right = new Node<>(iter.next(), null);
+            sizeRight++;
+        }
+            // Derecha
+        Node<T> lastRight = right;
+        for (int i = index + 1; i < col.size(); i++) {
+            lastRight.next = new Node<>(iter.next(),null);
+            lastRight = lastRight.next;
+            sizeRight++;
+        }
     }
 
 
     public int index() {
-        // TODO Ejercicio 2
-        throw new UnsupportedOperationException("Ejercicio 2: por implementar");
+        return sizeLeft;
     }
 
 
     public int size() {
-        // TODO Ejercicio 3
-        throw new UnsupportedOperationException("Ejercicio 3: por implementar");
+        return sizeLeft + sizeRight;
     }
 
 
     public T current() {
-        // TODO Ejercicio 4
-        throw new UnsupportedOperationException("Ejercicio 4: por implementar");
+        if (right == null)
+            return null;
+
+        return right.data;
     }
 
 
     public void add(T item) {
-        // TODO Ejercicio 5
-        throw new UnsupportedOperationException("Ejercicio 5: por implementar");
+        left = new Node<>(item, left);
+        sizeLeft++;
     }
 
 
     public T remove() {
-        // TODO Ejercicio 6
-        throw new UnsupportedOperationException("Ejercicio 6: por implementar");
+        if (right == null) {
+            throw new NoSuchElementException();
+        }
+        T aux = right.data;
+        right = right.next;
+        sizeRight--;
+        return aux;
     }
 
 
     public T next() {
-        // TODO Ejercicio 7
-        throw new UnsupportedOperationException("Ejercicio 7: por implementar");
+        if (right == null) {
+            throw new NoSuchElementException();
+        }
+        Node<T> aux = right;
+        right = aux.next;
+        aux.next = left;
+        left = aux;
+        sizeRight--;
+        sizeLeft++;
+        return aux.data;
     }
 
 
     public T previous() {
-        // TODO Ejercicio 8
-        throw new UnsupportedOperationException("Ejercicio 8: por implementar");
+        if (left == null) {
+            throw new NoSuchElementException();
+        }
+        Node<T> aux = left;
+        left = aux.next;
+        aux.next = right;
+        right = aux;
+        sizeRight++;
+        sizeLeft--;
+        return aux.data;
     }
 
 
     public T moveTo(int index) {
-        // TODO Ejercicio 9
-        throw new UnsupportedOperationException("Ejercicio 9: por implementar");
+       if (index < 0 || index > size()) {
+           throw new IndexOutOfBoundsException();
+       }
+       int desplazamiento = index - sizeLeft;
+       if (desplazamiento < 0) {
+           desplazamiento = - desplazamiento;
+           for (int i = 0; i < desplazamiento; i++) {
+               previous();
+           }
+       }
+       else {
+           for (int i = 0; i < desplazamiento; i++) {
+               next();
+           }
+       }
+       if (right == null) {
+           return null;
+       }
+       return right.data;
     }
 
     /**
